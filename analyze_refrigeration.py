@@ -103,7 +103,8 @@ def _load_onoff_series(filepath: Path, cols: tuple[int, int]) -> pd.Series:
     df = df.iloc[:, [ts_col, val_col]].copy()
     df.columns = ["ts", "val"]
     df["ts"] = pd.to_datetime(df["ts"], errors="coerce")
-    df["val"] = pd.to_numeric(df["val"].replace({"0": 0, "1": 1}), errors="coerce")
+    repl = df["val"].replace({"0": 0, "1": 1})
+    df["val"] = pd.to_numeric(repl.infer_objects(copy=False), errors="coerce")
     df = df.dropna().sort_values("ts").drop_duplicates(subset=["ts"], keep="last")
     return df.set_index("ts")["val"]
 
@@ -277,7 +278,7 @@ def build_histogram(df: pd.DataFrame, bin_size: float = 10) -> pd.DataFrame:
     edges = np.arange(0, bins_ceil + bin_size, bin_size)
 
     bins = pd.cut(load, edges, right=False, labels=range(len(edges) - 1))
-    hist_hours = dt.groupby(bins).sum().reindex(range(len(edges) - 1), fill_value=0).values
+    hist_hours = dt.groupby(bins, observed=True).sum().reindex(range(len(edges) - 1), fill_value=0).values
 
     return pd.DataFrame({
         "bin_min": edges[:-1],
@@ -329,7 +330,7 @@ def write_system_outputs(
         return np.percentile(x, 5)
 
     weekly = (
-        df_plot.groupby("week_key", sort=False)
+        df_plot.groupby("week_key", sort=False, observed=True)
         .agg(
             p95_load_kw=("load_kw", p95),
             max_load_kw=("load_kw", "max"),
