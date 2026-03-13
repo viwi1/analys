@@ -1,0 +1,31 @@
+{
+  "compressors": [
+    {
+      "name": "C1",
+      "type": "inverter",
+      "capacity_kw": 38,
+      "file": "1675af4a8ed57c2bd2ae3b5b1daab234.csv"
+    },
+    {
+      "name": "C2",
+      "type": "onoff",
+      "capacity_kw": 17,
+      "file": "1881b54df468e0a814ef9848e231715b.csv",
+      "columns": [0, 1]
+    },
+    {
+      "name": "C3",
+      "type": "onoff",
+      "capacity_kw": 17,
+      "file": "1881b54df468e0a814ef9848e231715b.csv",
+      "columns": [4, 5]
+    },
+    {
+      "name": "C4",
+      "type": "onoff",
+      "capacity_kw": 18,
+      "file": "1881b54df468e0a814ef9848e231715b.csv",
+      "columns": [2, 3]
+    }
+  ]
+}
