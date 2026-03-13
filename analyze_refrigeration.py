@@ -103,8 +103,7 @@ def _load_onoff_series(filepath: Path, cols: tuple[int, int]) -> pd.Series:
     df = df.iloc[:, [ts_col, val_col]].copy()
     df.columns = ["ts", "val"]
     df["ts"] = pd.to_datetime(df["ts"], errors="coerce")
-    repl = df["val"].replace({"0": 0, "1": 1})
-    df["val"] = pd.to_numeric(repl.infer_objects(copy=False), errors="coerce")
+    df["val"] = df["val"].map({"0": 0.0, "1": 1.0})
     df = df.dropna().sort_values("ts").drop_duplicates(subset=["ts"], keep="last")
     return df.set_index("ts")["val"]
 
