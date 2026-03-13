@@ -164,7 +164,7 @@ Tidsintervallen mellan loggade punkter beräknas, och varje rad viktas med sitt 
 - **Tid över 80 % last:** `load_fraction >= 0,80`
 - **Tid vid full last:** `load_fraction >= 0,99`
 
-Timmar i datamängden räknas och extrapoleras till **timmar per år** (8760 h / antal timmar i datamängden).
+Timmar i datamängden räknas och extrapoleras till **timmar per år** (8766 h (365,25 dagar, normal�rskorrigering) / antal timmar i datamängden).
 
 ### Histogram
 

@@ -19,7 +19,8 @@ import numpy as np
 import pandas as pd
 
 SYSTEM_PREFIX_MAP = {"C": "MT", "F": "Frys", "H": "Komfort"}
-HOURS_PER_YEAR = 8760
+# Normalårskorrigering: 365.25 dagar/år (inkl. skottår i genomsnitt)
+HOURS_PER_YEAR = 365.25 * 24  # = 8766 h
 
 
 def validate_config_files(config: dict, input_dir: Path) -> None:
@@ -30,10 +31,8 @@ def validate_config_files(config: dict, input_dir: Path) -> None:
             raise FileNotFoundError(f"Fil hittades inte: {filepath}")
 
 
-def load_config(path: Path) -> dict:
-    """Läs och validera config.json."""
-    with open(path, "r", encoding="utf-8") as f:
-        config = json.load(f)
+def _validate_config_structure(config: dict) -> None:
+    """Validera config-struktur (utan filkontroll)."""
     for c in config["compressors"]:
         if not all(k in c for k in ("name", "capacity_kw", "file")):
             raise ValueError(f"Kompressor saknar obligatoriskt fält (name, capacity_kw, file): {c}")
@@ -42,6 +41,20 @@ def load_config(path: Path) -> dict:
         c_type = c.get("type", "auto")
         if c_type not in ("inverter", "onoff", "auto"):
             raise ValueError(f"Ogiltig typ för {c['name']}: {c_type}")
+
+
+def load_config(path: Path) -> dict:
+    """Läs och validera config.json från fil."""
+    with open(path, "r", encoding="utf-8") as f:
+        config = json.load(f)
+    _validate_config_structure(config)
+    return config
+
+
+def load_config_from_json(data: str | bytes) -> dict:
+    """Läs och validera config från JSON-sträng eller bytes."""
+    config = json.loads(data)
+    _validate_config_structure(config)
     return config
 
 
