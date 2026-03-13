@@ -66,9 +66,24 @@ def group_compressors_by_system(config: dict) -> dict[str, list[dict]]:
 
 
 def _read_iwmac_csv(filepath: Path, skip_rows: int = 1) -> pd.DataFrame:
-    return pd.read_csv(
-        filepath, header=None, skiprows=skip_rows, encoding="utf-8", dtype=str
-    )
+    """Läs IWMAC CSV med robust hantering av encoding och felaktiga rader."""
+    encodings = ("utf-8", "utf-8-sig", "latin-1", "cp1252")
+    last_err = None
+    for enc in encodings:
+        try:
+            return pd.read_csv(
+                filepath,
+                header=None,
+                skiprows=skip_rows,
+                encoding=enc,
+                dtype=str,
+                on_bad_lines="skip",
+                engine="python",
+            )
+        except (pd.errors.ParserError, UnicodeDecodeError) as e:
+            last_err = e
+            continue
+    raise last_err or pd.errors.ParserError("Kunde inte läsa CSV")
 
 
 def _load_inverter_series(filepath: Path, cols: tuple[int, int]) -> pd.Series:
